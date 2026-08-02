@@ -66,6 +66,16 @@ class UserRepositoryImplTest extends PostgresIntegrationTest {
         );
     }
 
+    @Test
+    @DisplayName("Test: finding a non-existent should return empty")
+    void test_FindingANonExistent_ShouldReturnEmpty() {
+        // when - act
+        Optional<User> found = repository.findByUsername("does-non-existent");
+
+        // assert - that
+        assertTrue(found.isEmpty(), () -> "The username cannot be present!");
+    }
+
     private Permission fetchSeededPermission(String description) {
         return permissionJpaRepository.findByDescription(description)
                 .map(entity -> new Permission(entity.getId(), entity.getDescription()))
