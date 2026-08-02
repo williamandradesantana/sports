@@ -1,11 +1,11 @@
 package io.github.williamandradesantana.sports.domain.user;
 
 import io.github.williamandradesantana.sports.domain.user.exceptions.InvalidPasswordException;
+import io.github.williamandradesantana.sports.domain.user.exceptions.InvalidPermissionDescriptionException;
+import io.github.williamandradesantana.sports.domain.user.exceptions.InvalidPermissionException;
 import io.github.williamandradesantana.sports.domain.user.exceptions.InvalidUsernameException;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 public class User {
     private final UUID id;
@@ -23,18 +23,15 @@ public class User {
             boolean accountNonExpired, boolean accountNonLocked, boolean credentialsNonExpired, boolean enabled,
             Set<Permission> permissions
     ) {
-        if (username == null || username.isBlank()) throw new InvalidUsernameException();
-        if (password == null || password.length() < 8) throw new InvalidPasswordException();
-
         this.id = id;
-        this.username = username;
+        setUsername(username);
         this.fullName = fullName;
-        this.password = password;
+        setPassword(password);
         this.accountNonExpired = accountNonExpired;
         this.accountNonLocked = accountNonLocked;
         this.credentialsNonExpired = credentialsNonExpired;
         this.enabled = enabled;
-        this.permissions = permissions != null ? permissions : new HashSet<>();
+        this.permissions = permissions != null ? new HashSet<>(permissions) : new HashSet<>();
     }
 
     public UUID getId() {
@@ -46,6 +43,7 @@ public class User {
     }
 
     public void setUsername(String username) {
+        if (username == null || username.isBlank()) throw new InvalidUsernameException();
         this.username = username;
     }
 
@@ -62,6 +60,7 @@ public class User {
     }
 
     public void setPassword(String password) {
+        if (password == null || password.length() < 8) throw new InvalidPasswordException();
         this.password = password;
     }
 
@@ -97,11 +96,17 @@ public class User {
         this.enabled = enabled;
     }
 
-    public Set<Permission> getPermissions() {
-        return permissions;
+    public void grantPermission(Permission permission) {
+        if (permission == null) throw new InvalidPermissionException("Permission cannot be null");
+        this.permissions.add(permission);
     }
 
-    public void setPermissions(Set<Permission> permissions) {
-        this.permissions = permissions;
+    public void revokePermission(Permission permission) {
+        if (permission == null) throw new InvalidPermissionException("Permission cannot be null");
+        this.permissions.remove(permission);
+    }
+
+    public Set<Permission> getPermissions() {
+        return Collections.unmodifiableSet(permissions);
     }
 }
