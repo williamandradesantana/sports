@@ -6,6 +6,7 @@ import io.github.williamandradesantana.sports.domain.user.exceptions.InvalidPerm
 import io.github.williamandradesantana.sports.domain.user.exceptions.InvalidUsernameException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -58,6 +59,17 @@ public class GlobalExceptionHandler {
             request.getDescription(false)
         );
         return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ResponseEntity<ExceptionResponse> handleBadCredentialsException(BadCredentialsException ex, WebRequest request) {
+        ExceptionResponse response = new ExceptionResponse(
+            Instant.now(),
+            ex.getMessage(),
+            request.getDescription(false)
+        );
+        return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(Exception.class)

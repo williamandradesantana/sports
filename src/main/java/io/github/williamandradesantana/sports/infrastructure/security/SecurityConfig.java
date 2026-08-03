@@ -1,5 +1,6 @@
 package io.github.williamandradesantana.sports.infrastructure.security;
 
+import io.github.williamandradesantana.sports.application.user.TokenService;
 import io.github.williamandradesantana.sports.domain.user.UserRepository;
 import io.github.williamandradesantana.sports.infrastructure.security.jwt.JwtAuthenticationFilter;
 import io.github.williamandradesantana.sports.infrastructure.security.jwt.JwtProperties;
@@ -37,10 +38,13 @@ public class SecurityConfig {
     }
 
     @Bean
-    public JwtAuthenticationFilter jwtAuthenticationFilter(
-            JwtService jwtService, UserDetailsService userDetailsService
-    ) {
-        return new JwtAuthenticationFilter(jwtService, userDetailsService);
+    public TokenService tokenService(JwtService jwtService) {
+        return jwtService;
+    }
+
+    @Bean
+    public JwtAuthenticationFilter jwtAuthenticationFilter(JwtService jwtService) {
+        return new JwtAuthenticationFilter(jwtService);
     }
 
     @Bean
@@ -61,8 +65,9 @@ public class SecurityConfig {
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth ->
-                    auth.requestMatchers("/auth/**").permitAll()
-                            .anyRequest().authenticated()
+                    auth
+                        .requestMatchers("/api/auth/**").permitAll()
+                        .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
