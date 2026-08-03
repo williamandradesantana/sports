@@ -21,3 +21,8 @@ spring:
       enabled: ${OUTPUT_ANSI_ENABLED:ALWAYS}
   main:
     banner-mode: OFF
+
+security:
+  jwt:
+    secret: ${JWT_SECRET}
+    expiration-seconds: ${JWT_EXPIRATION_SECONDS:3600}
