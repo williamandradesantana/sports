@@ -2,13 +2,16 @@ package io.github.williamandradesantana.sports.infrastructure.security.jwt;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import io.github.williamandradesantana.sports.application.user.TokenService;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
-public class JwtService {
+public class JwtService implements TokenService {
 
     private final Algorithm algorithm;
     private final long expirationSeconds;
@@ -18,29 +21,20 @@ public class JwtService {
         this.expirationSeconds = properties.expirationSeconds();
     }
 
-    public String generateToken(String username) {
+    @Override
+    public String generateToken(String username, Set<String> roles) {
         Instant now = Instant.now();
         return JWT.create()
             .withSubject(username)
+            .withClaim("roles", new ArrayList<>(roles))
             .withIssuedAt(Date.from(now))
             .withExpiresAt(Date.from(now.plusSeconds(expirationSeconds)))
             .sign(algorithm);
     }
 
-    public String extractUsername(String token) {
-        return verify(token).getSubject();
-    }
-
-    public boolean isValid(String token) {
-        try {
-            verify(token);
-            return true;
-        } catch (JWTVerificationException e) {
-            return false;
-        }
-    }
-
-    private DecodedJWT verify(String token) {
-        return JWT.require(algorithm).build().verify(token);
+    public TokenClaims verifyAndExtractClaims(String token) {
+        DecodedJWT decoded = JWT.require(algorithm).build().verify(token);
+        Set<String> roles = new HashSet<>(decoded.getClaim("roles").asList(String.class));
+        return new TokenClaims(decoded.getSubject(), roles);
     }
 }
