@@ -1,3 +1,0 @@
-- Criar migration da tabela users e permissions - ok
-- Criar autenticação com o spring security
-- Criar docker-compose para o postgres - ok
