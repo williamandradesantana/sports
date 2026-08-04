@@ -1,9 +1,6 @@
 package io.github.williamandradesantana.sports.interfaces.shared;
 
-import io.github.williamandradesantana.sports.domain.user.exceptions.InvalidPasswordException;
-import io.github.williamandradesantana.sports.domain.user.exceptions.InvalidPermissionDescriptionException;
-import io.github.williamandradesantana.sports.domain.user.exceptions.InvalidPermissionException;
-import io.github.williamandradesantana.sports.domain.user.exceptions.InvalidUsernameException;
+import io.github.williamandradesantana.sports.domain.user.exceptions.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -53,6 +50,17 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(InvalidPermissionException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public ResponseEntity<ExceptionResponse> handleInvalidPermissionException(InvalidPermissionException ex, WebRequest request) {
+        ExceptionResponse response = new ExceptionResponse(
+            Instant.now(),
+            ex.getMessage(),
+            request.getDescription(false)
+        );
+        return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(UsernameAlreadyExistsException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ResponseEntity<ExceptionResponse> handleUsernameAlreadyExistsException(UsernameAlreadyExistsException ex, WebRequest request) {
         ExceptionResponse response = new ExceptionResponse(
             Instant.now(),
             ex.getMessage(),
