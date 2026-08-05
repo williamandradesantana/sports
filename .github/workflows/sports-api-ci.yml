@@ -13,6 +13,8 @@ jobs:
 
     env:
       JWT_SECRET: ${secret.JWT_SECRET}
+      GOOGLE_OAUTH_CLIENT_ID: ${secret.GOOGLE_OAUTH_CLIENT_ID}
+      GOOGLE_OAUTH_CLIENT_SECRET: ${secret.GOOGLE_OAUTH_CLIENT_SECRET}
 
     steps:
       - name: Checkout

@@ -22,6 +22,17 @@ spring:
   main:
     banner-mode: OFF
 
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_OAUTH_CLIENT_ID}
+            client-secret: ${GOOGLE_OAUTH_CLIENT_SECRET}
+            scope:
+              - email
+              - profile
+
 security:
   jwt:
     secret: ${JWT_SECRET}
