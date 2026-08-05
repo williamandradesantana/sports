@@ -1,5 +1,6 @@
 package io.github.williamandradesantana.sports.infrastructure.persistence.user;
 
+import io.github.williamandradesantana.sports.domain.user.AuthProvider;
 import io.github.williamandradesantana.sports.domain.user.Permission;
 import io.github.williamandradesantana.sports.domain.user.User;
 import io.github.williamandradesantana.sports.domain.user.UserRepository;
@@ -36,8 +37,8 @@ class UserRepositoryImplTest extends PostgresIntegrationTest {
         // given - arrange
         permission = fetchSeededPermission("ADMIN");
         user = new User(
-            UUID.randomUUID(), "william", "william santana", "password",
-            true, true, true, true,
+            UUID.randomUUID(), "william", "william santana", "user@email.com", "password",
+            AuthProvider.LOCAL, true, true, true, true,
             Set.of(permission)
         );
     }
@@ -74,6 +75,24 @@ class UserRepositoryImplTest extends PostgresIntegrationTest {
 
         // assert - that
         assertTrue(found.isEmpty(), () -> "The username cannot be present!");
+    }
+
+    @Test
+    @DisplayName("Test: saving a Google user without password should round-trip correctly")
+    void test_SavingGoogleUser_ShouldRoundTripWithoutPassword() {
+        user = new User(
+            UUID.randomUUID(), "user", "fullName", "user@gmail.com", null,
+            AuthProvider.GOOGLE,
+            true, true, true, true,
+            Set.of(permission)
+        );
+        repository.save(user);
+
+        Optional<User> found = repository.findByEmail("user@gmail.com");
+
+        assertTrue(found.isPresent());
+        assertNull(found.get().getPassword(), () -> "Expected Google user to have no password after reload");
+        assertEquals(AuthProvider.GOOGLE, found.get().getAuthProvider());
     }
 
     private Permission fetchSeededPermission(String description) {

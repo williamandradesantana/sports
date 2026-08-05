@@ -1,5 +1,6 @@
 package io.github.williamandradesantana.sports.infrastructure.persistence.user;
 
+import io.github.williamandradesantana.sports.domain.user.AuthProvider;
 import jakarta.persistence.*;
 
 import java.util.HashSet;
@@ -20,8 +21,15 @@ public class UserJpaEntity {
     @Column(name = "full_name")
     private String fullName;
 
+    @Column(name = "email", unique = true)
+    private String email;
+
     @Column(name = "password")
     private String password;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "auth_provider", nullable = false)
+    private AuthProvider authProvider;
 
     @Column(name = "account_non_expired", nullable = false)
     private boolean accountNonExpired;
@@ -45,11 +53,13 @@ public class UserJpaEntity {
 
     protected UserJpaEntity(){}
 
-    public UserJpaEntity(UUID id, String userName, String fullName, String password, boolean accountNonExpired, boolean accountNonLocked, boolean credentialsNonExpired, boolean enabled, Set<PermissionJpaEntity> permissions) {
+    public UserJpaEntity(UUID id, String userName, String fullName, String email, String password, AuthProvider authProvider, boolean accountNonExpired, boolean accountNonLocked, boolean credentialsNonExpired, boolean enabled, Set<PermissionJpaEntity> permissions) {
         this.id = id;
         this.userName = userName;
         this.fullName = fullName;
+        this.email = email;
         this.password = password;
+        this.authProvider = authProvider;
         this.accountNonExpired = accountNonExpired;
         this.accountNonLocked = accountNonLocked;
         this.credentialsNonExpired = credentialsNonExpired;
@@ -83,6 +93,22 @@ public class UserJpaEntity {
 
     public String getPassword() {
         return password;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public AuthProvider getAuthProvider() {
+        return authProvider;
+    }
+
+    public void setAuthProvider(AuthProvider authProvider) {
+        this.authProvider = authProvider;
     }
 
     public void setPassword(String password) {
