@@ -1,6 +1,7 @@
 package io.github.williamandradesantana.sports.application.user;
 
 import io.github.williamandradesantana.sports.domain.user.*;
+import io.github.williamandradesantana.sports.domain.user.exceptions.EmailAlreadyExistsException;
 import io.github.williamandradesantana.sports.domain.user.exceptions.UsernameAlreadyExistsException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -38,7 +39,9 @@ class RegisterUserUseCaseTest {
         MockitoAnnotations.openMocks(this);
         useCase = new RegisterUserUseCase(userRepository, permissionRepository, passwordEncoder);
         permission = new Permission(UUID.randomUUID(), PermissionName.COMMON_USER);
-        userCommand = new RegisterUserCommand("wbs", "william santana", "password-123");
+        userCommand = new RegisterUserCommand(
+                "wbs", "william santana", "wbs@gmail.com", "password-123"
+        );
     }
 
     @Test
@@ -68,6 +71,16 @@ class RegisterUserUseCaseTest {
         when(userRepository.findByUsername("wbs")).thenReturn(Optional.of(mock(User.class)));
 
         assertThrows(UsernameAlreadyExistsException.class, () -> useCase.execute(userCommand));
+        verify(userRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("Test: registering with an existing email should throw EmailAlreadyExistsException")
+    void test_RegisteringExistingEmail_ShouldThrow() {
+        when(userRepository.findByUsername("wbs")).thenReturn(Optional.empty());
+        when(userRepository.findByEmail("wbs@gmail.com")).thenReturn(Optional.of(mock(User.class)));
+
+        assertThrows(EmailAlreadyExistsException.class, () -> useCase.execute(userCommand));
         verify(userRepository, never()).save(any());
     }
 }

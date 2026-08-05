@@ -1,6 +1,7 @@
 package io.github.williamandradesantana.sports.application.user;
 
 import io.github.williamandradesantana.sports.domain.user.*;
+import io.github.williamandradesantana.sports.domain.user.exceptions.EmailAlreadyExistsException;
 import io.github.williamandradesantana.sports.domain.user.exceptions.UsernameAlreadyExistsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -24,6 +25,10 @@ public class RegisterUserUseCase {
             throw new UsernameAlreadyExistsException("Username already exists: " + command.username());
         });
 
+        userRepository.findByEmail(command.email()).ifPresent(existing -> {
+            throw new EmailAlreadyExistsException("Email already exists: " + command.username());
+        });
+
         Permission defaultPermission = permissionRepository.findByDescription(PermissionName.COMMON_USER)
                 .orElseThrow(() -> new IllegalStateException("Default permission not seeded: " + PermissionName.COMMON_USER));
 
@@ -33,7 +38,9 @@ public class RegisterUserUseCase {
             UUID.randomUUID(),
             command.username(),
             command.fullName(),
+            command.email(),
             encodedPassword,
+            AuthProvider.LOCAL,
             true, true, true, true,
             Set.of(defaultPermission)
         );

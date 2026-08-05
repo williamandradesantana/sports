@@ -1,4 +1,4 @@
 package io.github.williamandradesantana.sports.interfaces.auth.dto;
 
-public record RegisterRequest(String username, String fullName, String password) {
+public record RegisterRequest(String username, String fullName, String email, String password) {
 }

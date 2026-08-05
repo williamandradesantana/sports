@@ -1,9 +1,6 @@
 package io.github.williamandradesantana.sports.application.user;
 
-import io.github.williamandradesantana.sports.domain.user.Permission;
-import io.github.williamandradesantana.sports.domain.user.PermissionName;
-import io.github.williamandradesantana.sports.domain.user.User;
-import io.github.williamandradesantana.sports.domain.user.UserRepository;
+import io.github.williamandradesantana.sports.domain.user.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -51,9 +48,17 @@ class LoginUseCaseTest {
         // Given - Arrange
         permission = new Permission(UUID.randomUUID(), PermissionName.COMMON_USER);
         user = new User(
-            UUID.randomUUID(), "william", "william santana", "password",
-            true, true, true, true,
-            Set.of(permission)
+                UUID.randomUUID(),
+                "user",
+                "fullName",
+                "user@gmail.com",
+                "password",
+                AuthProvider.LOCAL,
+                true,
+                true,
+                true,
+                true,
+                Set.of(permission)
         );
         loginUseCase = new LoginUseCase(tokenService, authenticationManager, userRepository);
     }

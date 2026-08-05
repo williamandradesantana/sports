@@ -29,7 +29,9 @@ class AuthControllerTest extends PostgresIntegrationTest {
     @Test
     @DisplayName("Test: registering a new user should return 201 without exposing the password")
     void test_RegisteringNewUser_ShouldReturn201() throws Exception {
-        RegisterRequest registerRequest = new RegisterRequest("wbs", "William Santana", "password");
+        RegisterRequest registerRequest = new RegisterRequest(
+                "wbs", "William Santana", "user@gmail.com", "password"
+        );
 
         mockMvc.perform(post("/api/auth/register")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -43,7 +45,9 @@ class AuthControllerTest extends PostgresIntegrationTest {
     @Test
     @DisplayName("Test: registering a duplicate username should return 409")
     void test_RegisteringDuplicateUsername_ShouldReturn409() throws Exception {
-        RegisterRequest registerRequest = new RegisterRequest("wbs", "William Santana", "password");
+        RegisterRequest registerRequest = new RegisterRequest(
+                "wbs", "William Santana", "user@gmail.com", "password"
+        );
         String body = objectMapper.writeValueAsString(registerRequest);
 
         mockMvc.perform(
@@ -57,7 +61,7 @@ class AuthControllerTest extends PostgresIntegrationTest {
     @Test
     @DisplayName("Test: logging in with valid credentials should return a token")
     void test_LoginWithValidCredentials_ShouldReturnToken() throws Exception {
-        registerUser("logintest", "password");
+        registerUser("logintest", "logintest@gmail.com", "password");
         LoginRequest loginRequest = new LoginRequest("logintest", "password");
 
         mockMvc.perform(post("/api/auth/login")
@@ -70,7 +74,7 @@ class AuthControllerTest extends PostgresIntegrationTest {
     @Test
     @DisplayName("Test: logging in with wrong password should return 401 with a generic message")
     void test_LoginWithWrongPassword_ShouldReturn401() throws Exception {
-        registerUser("wrongpass", "password123");
+        registerUser("wrongpass", "wrongpass@gmail.com", "password123");
         LoginRequest loginRequest = new LoginRequest("wrongpass", "incorrect-password");
 
         mockMvc.perform(post("/api/auth/login")
@@ -91,8 +95,8 @@ class AuthControllerTest extends PostgresIntegrationTest {
             .andExpect(status().isUnauthorized());
     }
 
-    private void registerUser(String username, String password) throws Exception {
-        RegisterRequest registerRequest = new RegisterRequest(username, username, password);
+    private void registerUser(String username, String email, String password) throws Exception {
+        RegisterRequest registerRequest = new RegisterRequest(username, username, email, password);
         mockMvc.perform(post("/api/auth/register")
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(objectMapper.writeValueAsString(registerRequest)))
