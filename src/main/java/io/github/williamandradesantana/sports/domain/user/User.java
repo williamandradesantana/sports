@@ -1,9 +1,6 @@
 package io.github.williamandradesantana.sports.domain.user;
 
-import io.github.williamandradesantana.sports.domain.user.exceptions.InvalidPasswordException;
-import io.github.williamandradesantana.sports.domain.user.exceptions.InvalidPermissionDescriptionException;
-import io.github.williamandradesantana.sports.domain.user.exceptions.InvalidPermissionException;
-import io.github.williamandradesantana.sports.domain.user.exceptions.InvalidUsernameException;
+import io.github.williamandradesantana.sports.domain.user.exceptions.*;
 
 import java.util.*;
 
@@ -11,6 +8,8 @@ public class User {
     private final UUID id;
     private String username;
     private String fullName;
+    private String email;
+    private final AuthProvider authProvider;
     private String password;
     private boolean accountNonExpired = true;
     private boolean accountNonLocked = true;
@@ -19,14 +18,20 @@ public class User {
     private Set<Permission> permissions;
 
     public User(
-            UUID id, String username, String fullName, String password,
+            UUID id, String username, String fullName, String email, String password, AuthProvider authProvider,
             boolean accountNonExpired, boolean accountNonLocked, boolean credentialsNonExpired, boolean enabled,
             Set<Permission> permissions
     ) {
         this.id = id;
+        this.authProvider = authProvider;
+        setEmail(email);
         setUsername(username);
         this.fullName = fullName;
-        setPassword(password);
+        if (authProvider == AuthProvider.LOCAL) {
+            setPassword(password);
+        } else {
+            this.password = null;
+        }
         this.accountNonExpired = accountNonExpired;
         this.accountNonLocked = accountNonLocked;
         this.credentialsNonExpired = credentialsNonExpired;
@@ -47,6 +52,19 @@ public class User {
         this.username = username;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        if (email == null || email.isBlank() || !email.contains("@")) throw new InvalidEmailException("Email must be valid!");
+        this.email = email;
+    }
+
+    public AuthProvider getAuthProvider() {
+        return authProvider;
+    }
+
     public String getFullName() {
         return fullName;
     }
@@ -60,7 +78,11 @@ public class User {
     }
 
     public void setPassword(String password) {
-        if (password == null || password.length() < 8) throw new InvalidPasswordException();
+        if (authProvider != AuthProvider.LOCAL)
+            throw new InvalidPasswordException("Users authenticated via " + authProvider);
+
+        if (password == null || password.length() < 8)
+            throw new InvalidPasswordException("Password must be at least 8 characters long");
         this.password = password;
     }
 

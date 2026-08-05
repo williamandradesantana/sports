@@ -26,7 +26,9 @@ class UserTest {
             UUID.randomUUID(),
             "user",
             "fullName",
+            "user@gmail.com",
             "password",
+            AuthProvider.LOCAL,
             true,
             true,
             true,
@@ -143,6 +145,38 @@ class UserTest {
         assertThrows(UnsupportedOperationException.class,
             () -> user.getPermissions().add(new Permission(UUID.randomUUID(), "ADMIN")),
             () -> "Expected getPermissions() to return an unmodifiable set"
+        );
+    }
+
+    @Test
+    @DisplayName("Test: creating a google user without password should succeed")
+    void test_CreatingGoogleUser_WithoutPassword_ShouldSucceed() {
+        AuthProvider expectedProvider = AuthProvider.GOOGLE;
+        user = new User(
+            UUID.randomUUID(), "user", "fullName", "user@gmail.com", null,
+            AuthProvider.GOOGLE,
+            true, true, true, true,
+            Set.of(permission)
+        );
+
+        assertNull(user.getPassword(), () -> "The password must be null!");
+        assertEquals(expectedProvider, user.getAuthProvider(), () -> "The provider not matches!");
+    }
+
+    @Test
+    @DisplayName("Test: calling setPassword on a Google user should throw InvalidPasswordException")
+    void test_SettingPasswordOnGoogleUser_ShouldThrow() {
+        user = new User(
+            UUID.randomUUID(), "user", "fullName", "user@gmail.com", null,
+            AuthProvider.GOOGLE,
+            true, true, true, true,
+            Set.of(permission)
+        );
+
+        assertThrows(
+            InvalidPasswordException.class,
+            () -> user.setPassword("password"),
+            () -> "The provider google cannot have password"
         );
     }
 }
