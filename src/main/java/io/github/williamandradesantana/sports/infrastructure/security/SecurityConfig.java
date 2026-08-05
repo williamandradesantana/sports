@@ -1,14 +1,20 @@
 package io.github.williamandradesantana.sports.infrastructure.security;
 
+import io.github.williamandradesantana.sports.application.user.GoogleLoginUseCase;
 import io.github.williamandradesantana.sports.application.user.TokenService;
 import io.github.williamandradesantana.sports.domain.user.UserRepository;
 import io.github.williamandradesantana.sports.infrastructure.security.jwt.JwtAuthenticationFilter;
 import io.github.williamandradesantana.sports.infrastructure.security.jwt.JwtProperties;
 import io.github.williamandradesantana.sports.infrastructure.security.jwt.JwtService;
+import io.github.williamandradesantana.sports.infrastructure.security.oauth2.CookieOAuth2AuthorizationRequestRepository;
+import io.github.williamandradesantana.sports.infrastructure.security.oauth2.OAuth2LoginFailureHandler;
+import io.github.williamandradesantana.sports.infrastructure.security.oauth2.OAuth2LoginSuccessHandler;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -26,6 +32,24 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableMethodSecurity
 @EnableConfigurationProperties(JwtProperties.class)
 public class SecurityConfig {
+
+    @Value("${app.oauth2.authorized-redirect-uri}")
+    private String authorizedRedirectUri;
+
+    @Bean
+    public CookieOAuth2AuthorizationRequestRepository authorizationRequestRepository() {
+        return new CookieOAuth2AuthorizationRequestRepository();
+    }
+
+    @Bean
+    public OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler(GoogleLoginUseCase googleLoginUseCase) {
+        return new OAuth2LoginSuccessHandler(googleLoginUseCase, authorizedRedirectUri);
+    }
+
+    @Bean
+    public OAuth2LoginFailureHandler oAuth2LoginFailureHandler() {
+        return new OAuth2LoginFailureHandler(authorizedRedirectUri);
+    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -58,7 +82,13 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity, JwtAuthenticationFilter jwtAuthenticationFilter) {
+    public SecurityFilterChain securityFilterChain(
+            HttpSecurity httpSecurity,
+            JwtAuthenticationFilter jwtAuthenticationFilter,
+            CookieOAuth2AuthorizationRequestRepository authorizationRequestRepository,
+            OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler,
+            OAuth2LoginFailureHandler oAuth2LoginFailureHandler
+    ) {
         return httpSecurity
                 .csrf(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
@@ -66,8 +96,14 @@ public class SecurityConfig {
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth ->
                     auth
-                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/auth/**", "/oauth2/**").permitAll()
                         .anyRequest().authenticated()
+                )
+                .oauth2Login(oauth2 ->
+                    oauth2.authorizationEndpoint(
+                        endpoint -> endpoint.authorizationRequestRepository(authorizationRequestRepository))
+                        .successHandler(oAuth2LoginSuccessHandler)
+                        .failureHandler(oAuth2LoginFailureHandler)
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();

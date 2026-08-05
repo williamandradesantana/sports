@@ -27,4 +27,13 @@ public class UserApplicationConfig {
     ) {
         return new LoginUseCase(tokenService, authenticationManager, userRepository);
     }
+
+    @Bean
+    public GoogleLoginUseCase googleLoginUseCase(
+        UserRepository userRepository,
+        PermissionRepository permissionRepository,
+        TokenService tokenService
+    ) {
+        return new GoogleLoginUseCase(userRepository, permissionRepository, tokenService);
+    }
 }
