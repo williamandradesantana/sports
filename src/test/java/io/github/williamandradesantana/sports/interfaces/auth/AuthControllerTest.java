@@ -33,7 +33,7 @@ class AuthControllerTest extends PostgresIntegrationTest {
                 "wbs", "William Santana", "user@gmail.com", "password"
         );
 
-        mockMvc.perform(post("/api/auth/register")
+        mockMvc.perform(post("/api/v1/auth/register")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(registerRequest)))
             .andExpect(status().isCreated())
@@ -51,10 +51,10 @@ class AuthControllerTest extends PostgresIntegrationTest {
         String body = objectMapper.writeValueAsString(registerRequest);
 
         mockMvc.perform(
-            post("/api/auth/register").contentType(MediaType.APPLICATION_JSON_VALUE).content(body))
+            post("/api/v1/auth/register").contentType(MediaType.APPLICATION_JSON_VALUE).content(body))
             .andExpect(status().isCreated());
         mockMvc.perform(
-            post("/api/auth/register").contentType(MediaType.APPLICATION_JSON_VALUE).content(body))
+            post("/api/v1/auth/register").contentType(MediaType.APPLICATION_JSON_VALUE).content(body))
             .andExpect(status().isConflict());
     }
 
@@ -64,7 +64,7 @@ class AuthControllerTest extends PostgresIntegrationTest {
         registerUser("logintest", "logintest@gmail.com", "password");
         LoginRequest loginRequest = new LoginRequest("logintest", "password");
 
-        mockMvc.perform(post("/api/auth/login")
+        mockMvc.perform(post("/api/v1/auth/login")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(loginRequest)))
             .andExpect(status().isOk())
@@ -77,7 +77,7 @@ class AuthControllerTest extends PostgresIntegrationTest {
         registerUser("wrongpass", "wrongpass@gmail.com", "password123");
         LoginRequest loginRequest = new LoginRequest("wrongpass", "incorrect-password");
 
-        mockMvc.perform(post("/api/auth/login")
+        mockMvc.perform(post("/api/v1/auth/login")
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
                     .content(objectMapper.writeValueAsString(loginRequest)))
             .andExpect(status().isUnauthorized())
@@ -89,7 +89,7 @@ class AuthControllerTest extends PostgresIntegrationTest {
     void test_LoginWithNonExistentUsername_ShouldReturn401() throws Exception {
         LoginRequest loginRequest = new LoginRequest("does-not-exists", "password");
 
-        mockMvc.perform(post("/api/auth/login")
+        mockMvc.perform(post("/api/v1/auth/login")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(loginRequest)))
             .andExpect(status().isUnauthorized());
@@ -97,7 +97,7 @@ class AuthControllerTest extends PostgresIntegrationTest {
 
     private void registerUser(String username, String email, String password) throws Exception {
         RegisterRequest registerRequest = new RegisterRequest(username, username, email, password);
-        mockMvc.perform(post("/api/auth/register")
+        mockMvc.perform(post("/api/v1/auth/register")
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(objectMapper.writeValueAsString(registerRequest)))
                 .andExpect(status().isCreated());

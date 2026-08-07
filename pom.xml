@@ -31,11 +31,23 @@
 		<java-jwt.version>4.6.0</java-jwt.version>
 		<junit.version>6.1.2</junit.version>
 		<testcontainers-postgres.version>1.21.4</testcontainers-postgres.version>
+		<scalar.version>0.6.59</scalar.version>
+		<spring-doc.version>3.1.0</spring-doc.version>
 	</properties>
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.scalar.maven</groupId>
+			<artifactId>scalar-webmvc</artifactId>
+			<version>${scalar.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-starter-webmvc-scalar</artifactId>
+			<version>${spring-doc.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

@@ -22,6 +22,16 @@ spring:
   main:
     banner-mode: OFF
 
+  scalar:
+    enabled: true
+    sources:
+      - url: /v3/api-docs/v1
+        isDefault: true
+      - url: /v3/api-docs/v2
+        isDefault: false
+    # Adicionar url para o .json
+    # Não identificou os endpoints
+
   security:
     oauth2:
       client:
