@@ -48,7 +48,13 @@ class JwtServiceTest {
     @DisplayName("Test: verifying a tampered token should throw JWTVerificationException")
     void test_VerifyingTamperedToken_ShouldThrow() {
         String token = jwtService.generateToken("wbs", Set.of(PermissionName.COMMON_USER, PermissionName.ADMIN));
-        String tampered = token.substring(0, token.length() - 1) + (token.endsWith("A") ? "B" : "A");
+
+        String[] parts = token.split("\\.");
+        char[] payloadChars = parts[1].toCharArray();
+        int middleIndex = payloadChars.length / 2;
+        payloadChars[middleIndex] = payloadChars[middleIndex] == 'A' ? 'B' : 'A';
+
+        String tampered = parts[0] + "." + new String(payloadChars) + "." + parts[2];
 
         assertThrows(JWTVerificationException.class, () -> jwtService.verifyAndExtractClaims(tampered));
     }
