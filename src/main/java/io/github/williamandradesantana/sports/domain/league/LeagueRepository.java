@@ -6,7 +6,7 @@ import java.util.UUID;
 
 public interface LeagueRepository {
     Optional<League> findById(UUID id);
-    Optional<League> findByExternalId(Long id);
+    Optional<League> findByExternalId(Long externalId);
     List<League> finAll();
     void save(League league);
 }

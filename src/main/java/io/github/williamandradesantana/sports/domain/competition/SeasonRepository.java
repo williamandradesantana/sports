@@ -6,7 +6,7 @@ import java.util.UUID;
 
 public interface SeasonRepository {
     Optional<Season> findByLeagueIdAndYear(UUID leagueId, int year);
-    Optional<Season> findByCurrentByLeagueId(UUID id);
+    Optional<Season> findCurrentByLeagueId(UUID id);
     List<Season> findAllLeagueId(UUID leagueId);
     void save(Season season);
 }
