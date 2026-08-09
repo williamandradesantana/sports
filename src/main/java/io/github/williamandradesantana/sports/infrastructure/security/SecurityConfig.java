@@ -26,6 +26,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfigurationSource;
 
 @Configuration
 @EnableWebSecurity
@@ -84,12 +85,14 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(
             HttpSecurity httpSecurity,
+            CorsConfigurationSource corsConfigurationSource,
             JwtAuthenticationFilter jwtAuthenticationFilter,
             CookieOAuth2AuthorizationRequestRepository authorizationRequestRepository,
             OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler,
             OAuth2LoginFailureHandler oAuth2LoginFailureHandler
     ) {
         return httpSecurity
+                .cors(cors -> cors.configurationSource(corsConfigurationSource))
                 .csrf(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .sessionManagement(session ->
@@ -98,6 +101,7 @@ public class SecurityConfig {
                     auth
                         .requestMatchers(
                                 "/api/v1/auth/**", "/oauth2/**",
+                                "/api/v1/leagues/**",
                                 "/scalar", "/scalar/**", "/v3/api-docs/**", "/swagger-ui/**"
                         ).permitAll()
                         .anyRequest().authenticated()
