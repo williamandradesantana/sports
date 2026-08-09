@@ -1,9 +1,12 @@
 package io.github.williamandradesantana.sports.interfaces.shared;
 
+import io.github.williamandradesantana.sports.application.shared.ExternalDataSourceException;
 import io.github.williamandradesantana.sports.domain.user.exceptions.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -98,6 +101,50 @@ public class GlobalExceptionHandler {
             Instant.now(),
             ex.getMessage(),
             request.getDescription(false)
+        );
+        return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(ExternalDataSourceException.class)
+    @ResponseStatus(HttpStatus.BAD_GATEWAY)
+    public ResponseEntity<ExceptionResponse> handleExternalDataSourceException(ExternalDataSourceException ex, WebRequest request) {
+        ExceptionResponse response = new ExceptionResponse(
+            Instant.now(),
+            ex.getMessage(),
+            request.getDescription(false)
+        );
+        return new ResponseEntity<>(response, HttpStatus.BAD_GATEWAY);
+    }
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ResponseEntity<ExceptionResponse> handleResourceNotFoundException(ResourceNotFoundException ex, WebRequest request) {
+        ExceptionResponse response = new ExceptionResponse(
+            Instant.now(),
+            ex.getMessage(),
+            request.getDescription(false)
+        );
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ResponseEntity<ExceptionResponse> handleAccessDeniedException(AccessDeniedException ex, WebRequest request) {
+        ExceptionResponse response = new ExceptionResponse(
+                Instant.now(),
+                "You do not have permission to access this resource",
+                request.getDescription(false)
+        );
+        return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ResponseEntity<ExceptionResponse> handleAuthenticationException(AuthenticationException ex, WebRequest request) {
+        ExceptionResponse response = new ExceptionResponse(
+                Instant.now(),
+                "Authentication is required to access this resource",
+                request.getDescription(false)
         );
         return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
     }
