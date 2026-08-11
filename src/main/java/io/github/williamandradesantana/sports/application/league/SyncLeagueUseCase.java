@@ -1,5 +1,6 @@
 package io.github.williamandradesantana.sports.application.league;
 
+import io.github.williamandradesantana.sports.application.shared.ResourceNotFoundException;
 import io.github.williamandradesantana.sports.domain.competition.Season;
 import io.github.williamandradesantana.sports.domain.competition.SeasonRepository;
 import io.github.williamandradesantana.sports.domain.league.League;
@@ -20,18 +21,22 @@ public class SyncLeagueUseCase {
         this.seasonRepository = seasonRepository;
     }
 
-    public void syncByExternalId(Long externalId) {
+    public League syncByExternalId(Long externalId) {
         List<ExternalLeagueData> externalLeagues = leagueProvider.fetchLeagueByExternalId(externalId);
-        externalLeagues.forEach(this::syncLeague);
+        return externalLeagues.stream()
+                .map(this::syncLeague)
+                .findFirst()
+                .orElseThrow(() -> new ResourceNotFoundException("League not found in external source: externalId=" + externalId));
     }
 
-    private void syncLeague(ExternalLeagueData externalLeague) {
+    private League syncLeague(ExternalLeagueData externalLeague) {
         League league = leagueRepository.findByExternalId(externalLeague.externalId())
                 .map(existing -> updateExistingLeague(existing, externalLeague))
                 .orElseGet(() -> createNewLeague(externalLeague));
 
         leagueRepository.save(league);
         externalLeague.seasons().forEach(externalSeason -> syncSeason(league.getId(), externalSeason));
+        return league;
     }
 
     private League updateExistingLeague(League league, ExternalLeagueData externalLeague) {

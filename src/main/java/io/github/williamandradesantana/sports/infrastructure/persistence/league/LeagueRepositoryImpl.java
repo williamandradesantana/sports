@@ -2,6 +2,8 @@ package io.github.williamandradesantana.sports.infrastructure.persistence.league
 
 import io.github.williamandradesantana.sports.domain.league.League;
 import io.github.williamandradesantana.sports.domain.league.LeagueRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -28,8 +30,8 @@ public class LeagueRepositoryImpl implements LeagueRepository {
     }
 
     @Override
-    public List<League> finAll() {
-        return jpaRepository.findAll().stream().map(mapper::toDomain).toList();
+    public Page<League> findAll(Pageable pageable) {
+        return jpaRepository.findAll(pageable).map(mapper::toDomain);
     }
 
     @Override

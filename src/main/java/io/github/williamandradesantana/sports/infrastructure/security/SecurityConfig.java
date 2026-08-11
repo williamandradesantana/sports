@@ -9,10 +9,13 @@ import io.github.williamandradesantana.sports.infrastructure.security.jwt.JwtSer
 import io.github.williamandradesantana.sports.infrastructure.security.oauth2.CookieOAuth2AuthorizationRequestRepository;
 import io.github.williamandradesantana.sports.infrastructure.security.oauth2.OAuth2LoginFailureHandler;
 import io.github.williamandradesantana.sports.infrastructure.security.oauth2.OAuth2LoginSuccessHandler;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -101,11 +104,15 @@ public class SecurityConfig {
                     auth
                         .requestMatchers(
                                 "/api/v1/auth/**", "/oauth2/**",
-                                "/api/v1/leagues/**",
                                 "/scalar", "/scalar/**", "/v3/api-docs/**", "/swagger-ui/**"
                         ).permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/leagues").permitAll()
                         .anyRequest().authenticated()
                 )
+                .exceptionHandling(exception ->
+                        exception.authenticationEntryPoint((
+                                (request, response, authException) ->
+                                response.sendError(HttpServletResponse.SC_FORBIDDEN))))
                 .oauth2Login(oauth2 ->
                     oauth2.authorizationEndpoint(
                         endpoint -> endpoint.authorizationRequestRepository(authorizationRequestRepository))

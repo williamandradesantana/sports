@@ -23,7 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
-class LeagueControllerTest extends PostgresIntegrationTest {
+class LeagueAdminControllerTest extends PostgresIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -34,7 +34,7 @@ class LeagueControllerTest extends PostgresIntegrationTest {
     @Test
     @DisplayName("Test: syncing without a token should return 403")
     void test_SyncingWithoutToken_ShouldReturn403() throws Exception {
-        mockMvc.perform(post("/api/v1/leagues/sync").queryParam("externalId", "39"))
+        mockMvc.perform(post("/api/v1/admin/leagues/sync").queryParam("externalId", "39"))
                 .andExpect(status().isForbidden());
     }
 
@@ -43,7 +43,7 @@ class LeagueControllerTest extends PostgresIntegrationTest {
     void test_SyncingWithNonAdminToken_ShouldReturn403() throws Exception {
         String token = jwtService.generateToken("regular-user", Set.of(PermissionName.COMMON_USER));
 
-        mockMvc.perform(post("/api/v1/leagues/sync")
+        mockMvc.perform(post("/api/v1/admin/leagues/sync")
                 .queryParam("externalId", "39")
                 .header("Authorization", "Bearer " + token)
                 .header("Origin", "http://localhost:3000"))
@@ -53,7 +53,7 @@ class LeagueControllerTest extends PostgresIntegrationTest {
     @Test
     @DisplayName("Test: preflight request from allowed origin should include CORS headers")
     void test_PreflightFromAllowedOrigin_ShouldIncludeCorsHeaders() throws Exception {
-        mockMvc.perform(options("/api/v1/leagues/sync")
+        mockMvc.perform(options("/api/v1/admin/leagues/sync")
                         .header("Origin", "http://localhost:3000")
                         .header("Access-Control-Request-Method", "POST"))
                 .andExpect(status().isOk())
@@ -63,7 +63,7 @@ class LeagueControllerTest extends PostgresIntegrationTest {
     @Test
     @DisplayName("Test: preflight request from a non-allowed origin should be rejected")
     void test_PreflightFromDisallowedOrigin_ShouldBeRejected() throws Exception {
-        mockMvc.perform(options("/api/v1/leagues/sync")
+        mockMvc.perform(options("/api/v1/admin/leagues/sync")
                         .header("Origin", "https://malicious-site.com")
                         .header("Access-Control-Request-Method", "POST"))
                 .andExpect(status().isForbidden());
