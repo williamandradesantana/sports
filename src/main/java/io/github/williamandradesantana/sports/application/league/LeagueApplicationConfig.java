@@ -16,4 +16,17 @@ public class LeagueApplicationConfig {
     ) {
         return new SyncLeagueUseCase(leagueProvider, leagueRepository, seasonRepository);
     }
+
+    @Bean
+    public GetLeagueDetailsUseCase getLeagueDetailsUseCase(
+            LeagueRepository leagueRepository,
+            SeasonRepository seasonRepository
+    ) {
+        return new GetLeagueDetailsUseCase(leagueRepository, seasonRepository);
+    }
+
+    @Bean
+    public ListLeagueUseCase listLeagueUseCase(LeagueRepository leagueRepository) {
+        return new ListLeagueUseCase(leagueRepository);
+    }
 }
