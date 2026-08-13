@@ -9,6 +9,16 @@ import org.springframework.context.annotation.Configuration;
 public class TeamApplicationConfig {
 
     @Bean
+    public GetTeamDetailsUseCase getTeamDetailsUseCase(TeamRepository teamRepository, VenueRepository venueRepository) {
+        return new GetTeamDetailsUseCase(teamRepository, venueRepository);
+    }
+
+    @Bean
+    public ListTeamUseCase listTeamUseCase(TeamRepository teamRepository) {
+        return new ListTeamUseCase(teamRepository);
+    }
+
+    @Bean
     public SyncTeamUseCase syncTeamUseCase(
             TeamProvider teamProvider, TeamRepository teamRepository, VenueRepository venueRepository
     ) {
