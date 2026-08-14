@@ -2,8 +2,7 @@ package io.github.williamandradesantana.sports.infrastructure.externalapi.apifoo
 
 import io.github.williamandradesantana.sports.application.league.ExternalLeagueData;
 import io.github.williamandradesantana.sports.domain.league.LeagueType;
-import io.github.williamandradesantana.sports.infrastructure.shared.apifootball.ApiFootballHttpClient;
-import io.github.williamandradesantana.sports.infrastructure.shared.apifootball.ApiFootballProperties;
+import io.github.williamandradesantana.sports.infrastructure.externalapi.apifootball.shared.TestApiFootballHttpClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

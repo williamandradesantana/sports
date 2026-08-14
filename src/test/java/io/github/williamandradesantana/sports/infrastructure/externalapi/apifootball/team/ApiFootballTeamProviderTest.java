@@ -1,6 +1,7 @@
 package io.github.williamandradesantana.sports.infrastructure.externalapi.apifootball.team;
 
 import io.github.williamandradesantana.sports.application.team.ExternalTeamData;
+import io.github.williamandradesantana.sports.infrastructure.externalapi.apifootball.shared.TestApiFootballHttpClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
