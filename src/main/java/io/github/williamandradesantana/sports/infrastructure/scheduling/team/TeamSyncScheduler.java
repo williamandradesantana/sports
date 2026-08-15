@@ -26,7 +26,7 @@ public class TeamSyncScheduler {
         this.trackedLeaguesProperties = trackedLeaguesProperties;
     }
 
-    @Scheduled(cron = "${app.scheduling.team-sync-cron}")
+//    @Scheduled(cron = "${app.scheduling.team-sync-cron}")
     public void syncTeamsForTrackedLeagues() {
         logger.info("Starting scheduled team sync for {} tracked league(s)",
                 trackedLeaguesProperties.externalIds().size());
