@@ -22,4 +22,18 @@ public class MatchApplicationConfig {
             seasonRepository, teamRepository, venueRepository
         );
     }
+
+    @Bean
+    public GetMatchDetailsUseCase getMatchDetailsUseCase(
+            TeamRepository teamRepository, VenueRepository venueRepository, MatchRepository matchRepository
+    ) {
+        return new GetMatchDetailsUseCase(teamRepository, venueRepository, matchRepository);
+    }
+
+    @Bean
+    public GetMatchesByTeamUseCase getMatchesByTeamUseCase(
+            MatchRepository matchRepository, GetMatchDetailsUseCase getMatchDetailsUseCase
+    ) {
+        return new GetMatchesByTeamUseCase(matchRepository, getMatchDetailsUseCase);
+    }
 }
