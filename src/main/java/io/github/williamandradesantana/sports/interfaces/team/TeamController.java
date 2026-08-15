@@ -33,7 +33,7 @@ public class TeamController {
         @RequestParam(value = "direction", defaultValue = "0") String direction
     ) {
        var sortedDirection = "desc".equalsIgnoreCase(direction) ? Direction.DESC : Direction.ASC;
-       var pageable = PageRequest.of(page, size, Sort.by(sortedDirection, "name"));
+       var pageable = PageRequest.of(page, size, Sort.by(sortedDirection, "countryName", "name"));
        var teams = listTeamUseCase.execute(pageable).map(TeamResponse::from);
        return ResponseEntity.ok(teams);
     }
