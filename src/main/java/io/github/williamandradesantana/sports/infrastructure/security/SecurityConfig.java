@@ -1,8 +1,10 @@
 package io.github.williamandradesantana.sports.infrastructure.security;
 
+import io.github.williamandradesantana.sports.application.audit.RecordAccessLogUseCase;
 import io.github.williamandradesantana.sports.application.user.GoogleLoginUseCase;
 import io.github.williamandradesantana.sports.application.user.TokenService;
 import io.github.williamandradesantana.sports.domain.user.UserRepository;
+import io.github.williamandradesantana.sports.infrastructure.security.audit.AccessLogListener;
 import io.github.williamandradesantana.sports.infrastructure.security.jwt.JwtAuthenticationFilter;
 import io.github.williamandradesantana.sports.infrastructure.security.jwt.JwtProperties;
 import io.github.williamandradesantana.sports.infrastructure.security.jwt.JwtService;
@@ -46,8 +48,15 @@ public class SecurityConfig {
     }
 
     @Bean
-    public OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler(GoogleLoginUseCase googleLoginUseCase) {
-        return new OAuth2LoginSuccessHandler(googleLoginUseCase, authorizedRedirectUri);
+    public AccessLogListener accessLogListener(RecordAccessLogUseCase recordAccessLogUseCase) {
+        return new AccessLogListener(recordAccessLogUseCase);
+    }
+
+    @Bean
+    public OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler(
+            GoogleLoginUseCase googleLoginUseCase, RecordAccessLogUseCase recordAccessLogUseCase
+    ) {
+        return new OAuth2LoginSuccessHandler(googleLoginUseCase, recordAccessLogUseCase, authorizedRedirectUri);
     }
 
     @Bean
