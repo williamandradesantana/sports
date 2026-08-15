@@ -4,9 +4,11 @@ import io.github.williamandradesantana.sports.domain.user.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 import java.util.Set;
@@ -17,6 +19,7 @@ import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class GoogleLoginUseCaseTest {
 
     @Mock
@@ -32,7 +35,6 @@ class GoogleLoginUseCaseTest {
 
     @BeforeEach
     void setup() {
-        MockitoAnnotations.openMocks(this);
         googleLoginUseCase = new GoogleLoginUseCase(userRepository, permissionRepository, tokenService);
     }
 
@@ -50,8 +52,10 @@ class GoogleLoginUseCaseTest {
         when(userRepository.findByEmail("wbs@example.com")).thenReturn(Optional.of(existingUser));
         when(tokenService.generateToken(eq("wbs"), anySet())).thenReturn("jwt-token");
 
-        String token = googleLoginUseCase.execute(new GoogleProfileCommand("wbs@example.com", "William Santana"));
+        User resolvedUser = googleLoginUseCase.resolveUser(new GoogleProfileCommand("wbs@example.com", "William Santana"));
+        String token = googleLoginUseCase.generateTokenFor(resolvedUser);
 
+        assertEquals(existingUser.getId(), resolvedUser.getId(), () -> "Expected to link to the existing account");
         assertEquals("jwt-token", token);
         verify(userRepository, never()).save(any());
         verify(permissionRepository, never()).findByDescription(any());
@@ -68,7 +72,9 @@ class GoogleLoginUseCaseTest {
                 .thenReturn(Optional.of(commonUser));
         when(tokenService.generateToken(eq("newperson"), anySet())).thenReturn("jwt-token");
 
-        String token = googleLoginUseCase.execute(new GoogleProfileCommand("newperson@example.com", "New Person"));
+        User resolvedUser = googleLoginUseCase
+                .resolveUser(new GoogleProfileCommand("newperson@example.com", "New person"));
+        String token = googleLoginUseCase.generateTokenFor(resolvedUser);
 
         assertEquals("jwt-token", token);
 
@@ -90,7 +96,9 @@ class GoogleLoginUseCaseTest {
                 .thenReturn(Optional.of(new Permission(UUID.randomUUID(), PermissionName.COMMON_USER)));
         when(tokenService.generateToken(eq("wbs1"), anySet())).thenReturn("jwt-token");
 
-        googleLoginUseCase.execute(new GoogleProfileCommand("wbs@example.com", "William Santana"));
+        User resolvedUser = googleLoginUseCase
+                .resolveUser(new GoogleProfileCommand("wbs@example.com", "William Santana"));
+        googleLoginUseCase.generateTokenFor(resolvedUser);
 
         var captor = ArgumentCaptor.forClass(User.class);
         verify(userRepository).save(captor.capture());

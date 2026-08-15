@@ -18,10 +18,14 @@ public class GoogleLoginUseCase {
         this.tokenService = tokenService;
     }
 
-    public String execute(GoogleProfileCommand command) {
-        User user = userRepository.findByEmail(command.email()).orElseGet(() -> registerNewGoogleUser(command));
+    public User resolveUser(GoogleProfileCommand command) {
+        return userRepository.findByEmail(command.email()).orElseGet(() -> registerNewGoogleUser(command));
+    }
 
-        Set<String> roles = user.getPermissions().stream().map(Permission::getDescription).collect(Collectors.toSet());
+    public String generateTokenFor(User user) {
+        Set<String> roles = user.getPermissions().stream()
+                .map(Permission::getDescription)
+                .collect(Collectors.toSet());
 
         return tokenService.generateToken(user.getUsername(), roles);
     }
