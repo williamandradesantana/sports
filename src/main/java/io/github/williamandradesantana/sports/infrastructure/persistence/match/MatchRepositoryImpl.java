@@ -2,6 +2,8 @@ package io.github.williamandradesantana.sports.infrastructure.persistence.match;
 
 import io.github.williamandradesantana.sports.domain.match.Match;
 import io.github.williamandradesantana.sports.domain.match.MatchRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -33,8 +35,8 @@ public class MatchRepositoryImpl implements MatchRepository {
     }
 
     @Override
-    public List<Match> findByTeamId(UUID teamId) {
-        return jpaRepository.findByHomeTeamIdOrAwayTeamId(teamId, teamId).stream().map(mapper::toDomain).toList();
+    public Page<Match> findByTeamId(Pageable pageable, UUID teamId) {
+        return jpaRepository.findByHomeTeamIdOrAwayTeamId(pageable, teamId, teamId).map(mapper::toDomain);
     }
 
     @Override
