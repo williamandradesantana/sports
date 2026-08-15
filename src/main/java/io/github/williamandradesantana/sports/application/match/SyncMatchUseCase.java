@@ -49,6 +49,11 @@ public class SyncMatchUseCase {
         return externalMatches.stream().map(this::syncMatch).toList();
     }
 
+    public List<Match> syncByExternalIds(List<Long> externalIds) {
+        List<ExternalMatchData> externalMatches = matchProvider.fetchMatchesByExternalIds(externalIds);
+        return externalMatches.stream().map(this::syncMatch).toList();
+    }
+
     private Match syncMatch(ExternalMatchData data) {
         League league = leagueRepository.findByExternalId(data.leagueExternalId())
                 .orElseThrow(() -> new ResourceNotFoundException(

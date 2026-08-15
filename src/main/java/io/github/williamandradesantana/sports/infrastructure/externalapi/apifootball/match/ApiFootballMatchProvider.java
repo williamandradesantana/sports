@@ -13,9 +13,11 @@ import org.springframework.web.util.UriBuilder;
 import java.net.URI;
 import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class ApiFootballMatchProvider implements MatchProvider {
 
+    private static final int MAX_IDS_PER_REQUEST = 20;
     private final ApiFootballHttpClient httpClient;
 
     public ApiFootballMatchProvider(ApiFootballHttpClient httpClient) {
@@ -25,6 +27,17 @@ public class ApiFootballMatchProvider implements MatchProvider {
     @Override
     public List<ExternalMatchData> fetchMatchByExternalId(Long externalId) {
         return fetch(uriBuilder -> uriBuilder.path("/fixtures").queryParam("id", externalId).build());
+    }
+
+    @Override
+    public List<ExternalMatchData> fetchMatchesByExternalIds(List<Long> externalIds) {
+        if (externalIds == null || externalIds.isEmpty()) return List.of();
+        if (externalIds.size() > MAX_IDS_PER_REQUEST)
+            throw new IllegalArgumentException(
+                "API-Football allows at most " + MAX_IDS_PER_REQUEST + " ids per request, got " + externalIds.size()
+            );
+        String joinedIds = externalIds.stream().map(String::valueOf).collect(Collectors.joining("-"));
+        return fetch(uriBuilder -> uriBuilder.path("/fixtures").queryParam("ids", joinedIds).build());
     }
 
     @Override

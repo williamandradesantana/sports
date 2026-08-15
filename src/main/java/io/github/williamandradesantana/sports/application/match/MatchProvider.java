@@ -4,5 +4,6 @@ import java.util.List;
 
 public interface MatchProvider {
     List<ExternalMatchData> fetchMatchByExternalId(Long externalId);
+    List<ExternalMatchData> fetchMatchesByExternalIds(List<Long> externalIds);
     List<ExternalMatchData> fetchMatchesByLeagueAndSeason(Long leagueExternalId, int season);
 }
