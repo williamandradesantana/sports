@@ -106,7 +106,10 @@ public class SecurityConfig {
                                 "/api/v1/auth/**", "/oauth2/**",
                                 "/scalar", "/scalar/**", "/v3/api-docs/**", "/swagger-ui/**"
                         ).permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/leagues", "/api/v1/teams").permitAll()
+                        .requestMatchers(
+                            HttpMethod.GET,
+                            "/api/v1/leagues/**", "/api/v1/teams/**", "/api/v1/matches/**"
+                        ).permitAll()
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(exception ->
