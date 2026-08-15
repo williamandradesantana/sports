@@ -2,6 +2,7 @@ package io.github.williamandradesantana.sports.interfaces.shared;
 
 import io.github.williamandradesantana.sports.application.shared.ExternalDataSourceException;
 import io.github.williamandradesantana.sports.application.shared.ResourceNotFoundException;
+import io.github.williamandradesantana.sports.domain.audit.exceptions.InvalidAccessLogException;
 import io.github.williamandradesantana.sports.domain.user.exceptions.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -137,6 +138,17 @@ public class GlobalExceptionHandler {
                 request.getDescription(false)
         );
         return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(InvalidAccessLogException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ResponseEntity<ExceptionResponse> handleInvalidAccessLogException(InvalidAccessLogException ex, WebRequest request) {
+        ExceptionResponse response = new ExceptionResponse(
+                Instant.now(),
+                ex.getMessage(),
+                request.getDescription(false)
+        );
+        return new ResponseEntity<>(response, HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(AuthenticationException.class)
