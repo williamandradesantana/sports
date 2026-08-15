@@ -1,10 +1,12 @@
 package io.github.williamandradesantana.sports.infrastructure.scheduling;
 
 import io.github.williamandradesantana.sports.application.league.SyncLeagueUseCase;
+import io.github.williamandradesantana.sports.application.match.SyncMatchUseCase;
 import io.github.williamandradesantana.sports.application.team.SyncTeamUseCase;
 import io.github.williamandradesantana.sports.domain.competition.SeasonRepository;
 import io.github.williamandradesantana.sports.domain.league.LeagueRepository;
 import io.github.williamandradesantana.sports.infrastructure.scheduling.league.LeagueSyncScheduler;
+import io.github.williamandradesantana.sports.infrastructure.scheduling.match.MatchSyncScheduler;
 import io.github.williamandradesantana.sports.infrastructure.scheduling.team.TeamSyncScheduler;
 import io.github.williamandradesantana.sports.infrastructure.shared.apifootball.TrackedLeaguesProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -28,5 +30,13 @@ public class SchedulingConfig {
     @Bean
     public LeagueSyncScheduler leagueSyncScheduler(SyncLeagueUseCase syncLeagueUseCase, TrackedLeaguesProperties trackedLeaguesProperties) {
         return new LeagueSyncScheduler(syncLeagueUseCase, trackedLeaguesProperties);
+    }
+
+    @Bean
+    public MatchSyncScheduler matchSyncScheduler(
+            SyncMatchUseCase syncMatchUseCase, LeagueRepository leagueRepository,
+            SeasonRepository seasonRepository, TrackedLeaguesProperties trackedLeaguesProperties
+    ) {
+        return new MatchSyncScheduler(syncMatchUseCase, leagueRepository, seasonRepository, trackedLeaguesProperties);
     }
 }
