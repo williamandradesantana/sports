@@ -3,6 +3,7 @@ package io.github.williamandradesantana.sports.application.match;
 import io.github.williamandradesantana.sports.domain.competition.SeasonRepository;
 import io.github.williamandradesantana.sports.domain.league.LeagueRepository;
 import io.github.williamandradesantana.sports.domain.match.MatchRepository;
+import io.github.williamandradesantana.sports.domain.match.MatchStatisticsRepository;
 import io.github.williamandradesantana.sports.domain.team.TeamRepository;
 import io.github.williamandradesantana.sports.domain.venue.VenueRepository;
 import org.springframework.context.annotation.Bean;
@@ -35,5 +36,20 @@ public class MatchApplicationConfig {
             MatchRepository matchRepository, GetMatchDetailsUseCase getMatchDetailsUseCase
     ) {
         return new GetMatchesByTeamUseCase(matchRepository, getMatchDetailsUseCase);
+    }
+
+    @Bean
+    public SyncMatchStatisticsUseCase syncMatchStatisticsUseCase(
+            MatchStatisticsProvider matchStatisticsProvider, MatchStatisticsRepository matchStatisticsRepository,
+            MatchRepository matchRepository, TeamRepository teamRepository
+    ) {
+        return new SyncMatchStatisticsUseCase(matchStatisticsProvider, matchStatisticsRepository, teamRepository, matchRepository);
+    }
+
+    @Bean
+    public GetMatchStatisticsUseCase getMatchStatisticsUseCase(
+            MatchRepository matchRepository, MatchStatisticsRepository matchStatisticsRepository
+    ) {
+        return new GetMatchStatisticsUseCase(matchRepository, matchStatisticsRepository);
     }
 }
