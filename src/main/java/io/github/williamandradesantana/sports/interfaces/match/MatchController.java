@@ -1,7 +1,7 @@
 package io.github.williamandradesantana.sports.interfaces.match;
 
-import io.github.williamandradesantana.sports.application.match.GetMatchDetailsUseCase;
-import io.github.williamandradesantana.sports.application.match.GetMatchesByTeamUseCase;
+import io.github.williamandradesantana.sports.application.match.*;
+import io.github.williamandradesantana.sports.interfaces.match.dto.MatchDetailResponse;
 import io.github.williamandradesantana.sports.interfaces.match.dto.MatchResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -17,17 +17,21 @@ import java.util.UUID;
 @RequestMapping("/api/v1/matches")
 public class MatchController {
 
+    private final GetMatchStatisticsUseCase getMatchStatisticsUseCase;
     private final GetMatchDetailsUseCase getMatchDetailsUseCase;
     private final GetMatchesByTeamUseCase getMatchesByTeamUseCase;
 
-    public MatchController(GetMatchDetailsUseCase getMatchDetailsUseCase, GetMatchesByTeamUseCase getMatchesByTeamUseCase) {
+    public MatchController(GetMatchStatisticsUseCase getMatchStatisticsUseCase, GetMatchDetailsUseCase getMatchDetailsUseCase, GetMatchesByTeamUseCase getMatchesByTeamUseCase) {
+        this.getMatchStatisticsUseCase = getMatchStatisticsUseCase;
         this.getMatchDetailsUseCase = getMatchDetailsUseCase;
         this.getMatchesByTeamUseCase = getMatchesByTeamUseCase;
     }
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<MatchResponse> getById(@PathVariable("id") UUID id) {
-        return ResponseEntity.ok(MatchResponse.from(getMatchDetailsUseCase.execute(id)));
+    public ResponseEntity<MatchDetailResponse> getById(@PathVariable("id") UUID id) {
+        MatchDetails details = getMatchDetailsUseCase.execute(id);
+        MatchStatisticsPair statistics = getMatchStatisticsUseCase.execute(id);
+        return ResponseEntity.ok(MatchDetailResponse.from(details, statistics));
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)

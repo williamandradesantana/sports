@@ -1,5 +1,6 @@
 package io.github.williamandradesantana.sports.interfaces.match;
 
+import io.github.williamandradesantana.sports.application.match.SyncMatchStatisticsUseCase;
 import io.github.williamandradesantana.sports.application.match.SyncMatchUseCase;
 import io.github.williamandradesantana.sports.interfaces.match.dto.MatchResponse;
 import org.springframework.http.MediaType;
@@ -17,9 +18,11 @@ import java.util.List;
 @PreAuthorize("hasAuthority('ADMIN')")
 public class MatchAdminController {
 
+    private final SyncMatchStatisticsUseCase syncMatchStatisticsUseCase;
     private final SyncMatchUseCase syncMatchUseCase;
 
-    public MatchAdminController(SyncMatchUseCase syncMatchUseCase) {
+    public MatchAdminController(SyncMatchStatisticsUseCase syncMatchStatisticsUseCase, SyncMatchUseCase syncMatchUseCase) {
+        this.syncMatchStatisticsUseCase = syncMatchStatisticsUseCase;
         this.syncMatchUseCase = syncMatchUseCase;
     }
 
@@ -39,6 +42,12 @@ public class MatchAdminController {
     @PostMapping(value = "/sync-batch", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> syncByExternalIds(@RequestParam List<Long> externalIds) {
         syncMatchUseCase.syncByExternalIds(externalIds);
+        return ResponseEntity.accepted().build();
+    }
+
+    @PostMapping(value = "/sync-statistics", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> syncStatisticsByMatchExternalId(@RequestParam Long matchExternalId) {
+        syncMatchStatisticsUseCase.syncByMatchExternalId(matchExternalId);
         return ResponseEntity.accepted().build();
     }
 }
