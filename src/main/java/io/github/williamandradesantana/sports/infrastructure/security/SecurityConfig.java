@@ -117,7 +117,7 @@ public class SecurityConfig {
                         ).permitAll()
                         .requestMatchers(
                             HttpMethod.GET,
-                            "/api/v1/leagues/**", "/api/v1/teams/**", "/api/v1/matches/**"
+                            "/api/v1/leagues/**", "/api/v1/teams/**", "/api/v1/matches/**", "/api/v1/standings/**"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
