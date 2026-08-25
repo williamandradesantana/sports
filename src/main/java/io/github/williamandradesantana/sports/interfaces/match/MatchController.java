@@ -3,6 +3,8 @@ package io.github.williamandradesantana.sports.interfaces.match;
 import io.github.williamandradesantana.sports.application.match.*;
 import io.github.williamandradesantana.sports.interfaces.match.dto.MatchDetailResponse;
 import io.github.williamandradesantana.sports.interfaces.match.dto.MatchResponse;
+import io.github.williamandradesantana.sports.interfaces.match.dto.OddsResponse;
+import io.github.williamandradesantana.sports.interfaces.shared.dto.ListResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -11,6 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -20,11 +23,13 @@ public class MatchController {
     private final GetMatchStatisticsUseCase getMatchStatisticsUseCase;
     private final GetMatchDetailsUseCase getMatchDetailsUseCase;
     private final GetMatchesByTeamUseCase getMatchesByTeamUseCase;
+    private final GetOddsHistoryUseCase getOddsHistoryUseCase;
 
-    public MatchController(GetMatchStatisticsUseCase getMatchStatisticsUseCase, GetMatchDetailsUseCase getMatchDetailsUseCase, GetMatchesByTeamUseCase getMatchesByTeamUseCase) {
+    public MatchController(GetMatchStatisticsUseCase getMatchStatisticsUseCase, GetMatchDetailsUseCase getMatchDetailsUseCase, GetMatchesByTeamUseCase getMatchesByTeamUseCase, GetOddsHistoryUseCase getOddsHistoryUseCase) {
         this.getMatchStatisticsUseCase = getMatchStatisticsUseCase;
         this.getMatchDetailsUseCase = getMatchDetailsUseCase;
         this.getMatchesByTeamUseCase = getMatchesByTeamUseCase;
+        this.getOddsHistoryUseCase = getOddsHistoryUseCase;
     }
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -46,5 +51,12 @@ public class MatchController {
 
         Page<MatchResponse> response = getMatchesByTeamUseCase.execute(pageable, teamId).map(MatchResponse::from);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping(value = "/{id}/odds", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ListResponse<OddsResponse>> getOddsHistory(@PathVariable UUID id) {
+        List<OddsResponse> response = getOddsHistoryUseCase.execute(id)
+                .stream().map(OddsResponse::from).toList();
+        return ResponseEntity.ok(ListResponse.of(response));
     }
 }

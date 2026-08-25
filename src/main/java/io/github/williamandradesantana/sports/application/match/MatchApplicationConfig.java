@@ -63,4 +63,9 @@ public class MatchApplicationConfig {
                                            TrackedBookmakersProperties trackedBookmakersProperties) {
         return new SyncOddsUseCase(oddsProvider, oddsRepository, matchRepository, trackedBookmakersProperties);
     }
+
+    @Bean
+    public GetOddsHistoryUseCase getOddsHistoryUseCase(MatchRepository matchRepository, OddsRepository oddsRepository) {
+        return new GetOddsHistoryUseCase(matchRepository, oddsRepository);
+    }
 }
