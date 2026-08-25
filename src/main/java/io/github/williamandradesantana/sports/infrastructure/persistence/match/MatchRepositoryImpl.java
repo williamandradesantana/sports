@@ -5,6 +5,7 @@ import io.github.williamandradesantana.sports.domain.match.MatchRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -37,6 +38,11 @@ public class MatchRepositoryImpl implements MatchRepository {
     @Override
     public Page<Match> findByTeamId(Pageable pageable, UUID teamId) {
         return jpaRepository.findByHomeTeamIdOrAwayTeamId(pageable, teamId, teamId).map(mapper::toDomain);
+    }
+
+    @Override
+    public List<Match> findScheduledBetween(OffsetDateTime start, OffsetDateTime end) {
+        return jpaRepository.findScheduledBetween(start, end).stream().map(mapper::toDomain).toList();
     }
 
     @Override
