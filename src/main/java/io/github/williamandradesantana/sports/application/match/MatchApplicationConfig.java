@@ -4,12 +4,16 @@ import io.github.williamandradesantana.sports.domain.competition.SeasonRepositor
 import io.github.williamandradesantana.sports.domain.league.LeagueRepository;
 import io.github.williamandradesantana.sports.domain.match.MatchRepository;
 import io.github.williamandradesantana.sports.domain.match.MatchStatisticsRepository;
+import io.github.williamandradesantana.sports.domain.match.OddsRepository;
 import io.github.williamandradesantana.sports.domain.team.TeamRepository;
 import io.github.williamandradesantana.sports.domain.venue.VenueRepository;
+import io.github.williamandradesantana.sports.infrastructure.shared.apifootball.TrackedBookmakersProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
+@EnableConfigurationProperties(TrackedBookmakersProperties.class)
 public class MatchApplicationConfig {
 
     @Bean
@@ -51,5 +55,12 @@ public class MatchApplicationConfig {
             MatchRepository matchRepository, MatchStatisticsRepository matchStatisticsRepository
     ) {
         return new GetMatchStatisticsUseCase(matchRepository, matchStatisticsRepository);
+    }
+
+    @Bean
+    public SyncOddsUseCase syncOddsUseCase(OddsProvider oddsProvider, OddsRepository oddsRepository,
+                                           MatchRepository matchRepository,
+                                           TrackedBookmakersProperties trackedBookmakersProperties) {
+        return new SyncOddsUseCase(oddsProvider, oddsRepository, matchRepository, trackedBookmakersProperties);
     }
 }
