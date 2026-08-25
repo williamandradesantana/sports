@@ -2,6 +2,7 @@ package io.github.williamandradesantana.sports.infrastructure.persistence.match;
 
 import io.github.williamandradesantana.sports.domain.match.MatchRepository;
 import io.github.williamandradesantana.sports.domain.match.MatchStatisticsRepository;
+import io.github.williamandradesantana.sports.domain.match.OddsRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -28,5 +29,15 @@ public class MatchPersistenceConfig {
             MatchStatisticsJpaRepository jpaRepository, MatchStatisticsMapper matchStatisticsMapper
     ) {
         return new MatchStatisticsRepositoryImpl(jpaRepository, matchStatisticsMapper);
+    }
+
+    @Bean
+    public OddsMapper oddsMapper() {
+        return new OddsMapper();
+    }
+
+    @Bean
+    public OddsRepository oddsRepository(OddsJpaRepository oddsJpaRepository, OddsMapper oddsMapper) {
+        return new OddsRepositoryImpl(oddsJpaRepository, oddsMapper);
     }
 }
