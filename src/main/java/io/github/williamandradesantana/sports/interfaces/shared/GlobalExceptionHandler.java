@@ -1,5 +1,6 @@
 package io.github.williamandradesantana.sports.interfaces.shared;
 
+import io.github.williamandradesantana.sports.application.integrity.MatchNotAssessableException;
 import io.github.williamandradesantana.sports.application.shared.ExternalDataSourceException;
 import io.github.williamandradesantana.sports.application.shared.ResourceNotFoundException;
 import io.github.williamandradesantana.sports.domain.audit.exceptions.InvalidAccessLogException;
@@ -172,6 +173,17 @@ public class GlobalExceptionHandler {
                 request.getDescription(false)
         );
         return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(MatchNotAssessableException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ResponseEntity<ExceptionResponse> handleMatchNotAssessableException(MatchNotAssessableException ex, WebRequest request) {
+        ExceptionResponse response = new ExceptionResponse(
+                Instant.now(),
+                ex.getMessage(),
+                request.getDescription(false)
+        );
+        return new ResponseEntity<>(response, HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(Exception.class)

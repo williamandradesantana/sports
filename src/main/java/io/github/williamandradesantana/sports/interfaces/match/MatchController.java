@@ -1,6 +1,8 @@
 package io.github.williamandradesantana.sports.interfaces.match;
 
+import io.github.williamandradesantana.sports.application.integrity.GetIntegrityAssessmentUseCase;
 import io.github.williamandradesantana.sports.application.match.*;
+import io.github.williamandradesantana.sports.interfaces.integrity.dto.IntegrityAssessmentResponse;
 import io.github.williamandradesantana.sports.interfaces.match.dto.MatchDetailResponse;
 import io.github.williamandradesantana.sports.interfaces.match.dto.MatchResponse;
 import io.github.williamandradesantana.sports.interfaces.match.dto.OddsResponse;
@@ -24,12 +26,14 @@ public class MatchController {
     private final GetMatchDetailsUseCase getMatchDetailsUseCase;
     private final GetMatchesByTeamUseCase getMatchesByTeamUseCase;
     private final GetOddsHistoryUseCase getOddsHistoryUseCase;
+    private final GetIntegrityAssessmentUseCase getIntegrityAssessmentUseCase;
 
-    public MatchController(GetMatchStatisticsUseCase getMatchStatisticsUseCase, GetMatchDetailsUseCase getMatchDetailsUseCase, GetMatchesByTeamUseCase getMatchesByTeamUseCase, GetOddsHistoryUseCase getOddsHistoryUseCase) {
+    public MatchController(GetMatchStatisticsUseCase getMatchStatisticsUseCase, GetMatchDetailsUseCase getMatchDetailsUseCase, GetMatchesByTeamUseCase getMatchesByTeamUseCase, GetOddsHistoryUseCase getOddsHistoryUseCase, GetIntegrityAssessmentUseCase getIntegrityAssessmentUseCase) {
         this.getMatchStatisticsUseCase = getMatchStatisticsUseCase;
         this.getMatchDetailsUseCase = getMatchDetailsUseCase;
         this.getMatchesByTeamUseCase = getMatchesByTeamUseCase;
         this.getOddsHistoryUseCase = getOddsHistoryUseCase;
+        this.getIntegrityAssessmentUseCase = getIntegrityAssessmentUseCase;
     }
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -58,5 +62,10 @@ public class MatchController {
         List<OddsResponse> response = getOddsHistoryUseCase.execute(id)
                 .stream().map(OddsResponse::from).toList();
         return ResponseEntity.ok(ListResponse.of(response));
+    }
+
+    @GetMapping(value = "/{id}/integrity", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<IntegrityAssessmentResponse> getIntegrityAssessment(@PathVariable UUID id) {
+        return ResponseEntity.ok(IntegrityAssessmentResponse.from(getIntegrityAssessmentUseCase.execute(id)));
     }
 }
